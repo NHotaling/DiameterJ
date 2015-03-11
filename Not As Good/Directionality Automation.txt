@@ -1,0 +1,2 @@
+run("Directionality", "method=[Fourier components] nbins=90 histogram=-90 display_table");
+selectWindow(

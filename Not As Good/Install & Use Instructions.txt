@@ -1,0 +1,42 @@
+Install the SEM Pore Analysis Macro by:
+
+	1.  Finding the ImageJ plugin folder
+
+		Typically the ImageJ plugin folder can be found at:
+
+			"C:\Program Files\ImageJ\plugins"
+
+				or if not there
+
+			"C:\Program Files (x86)\ImageJ\plugins"
+
+	2.  Create a New Folder in the Image J plugin folder named "SEM Pore Analysis"
+
+		For windows 7 or Windows 8 once you have opened the "plugins" folder click the 
+		"New Folder" icon at the top of the window and and Name the folder "SEM Pore Analysis"
+
+		For Any version of Windows, once in the "plugins" folder right click and select
+		"New --> Folder". Rename the folder "SEM Pore Analysis"
+
+	3.  Save the "SEM_Pore_Analysis.ijm" file into this folder
+
+	4.  The macro will now self install into ImageJ when ImageJ is restarted!
+
+Note:  If ImageJ is open you must close and restart ImageJ before the macro will appear in the Plugins menu.  
+
+	
+
+
+	1.  To use the tool start ImageJ go to the Plugins menu and click "SEM Pore Analysis --> SEM Pore Analysis" 
+  
+	2.  A pop-up will appear asking for the directory you wish to analyze all TIF pictures within.
+
+		This tool will only analyze TIF files within the selected directory
+	
+	3.  A folder called "Processed" will be created within your selected directory with all analyzed 
+	images, pore information, and a summary of the pore information.
+
+	4.  A popup log window will appear after the analysis is finished if the words "Error" are not written in this 		window all analysis was performed correctly.
+	
+	5.  Check through pore analysis pictures to ensure analysis was performed correctly.
+	
