@@ -24,9 +24,13 @@
 	
 	var name0= getTitle;
 	var name1= getTitle+"_Intersections";
+		name1= replace(name1,".tif","");
 	var name2= getTitle+"_Skeleton";
+		name2= replace(name2,".tif","");
 	var name3= getTitle+"_EDT";
+		name3= replace(name3,".tif","");
 	var name4= getTitle+"_Overlay";
+		name4= replace(name4,".tif","");
 	
 
 		var path0 = myDir+name0;

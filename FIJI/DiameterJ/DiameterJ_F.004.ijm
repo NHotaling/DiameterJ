@@ -36,20 +36,33 @@
 // Creates custom file names for use later
 			var name0= getTitle;
 			var name1= getTitle+"_Voronoi";	
+				name1= replace(name1,".tif","");
 			var name2= getTitle+"_Axial Thinning.tif";
+				name2= replace(name2,".tif","");
 			var name3= getTitle+"_Diameter";
+				name3= replace(name3,".tif","");
 			var name4= getTitle+"_log";
+				name4= replace(name4,".tif","");
 			var name5= getTitle+"_Total Summary.csv";
+				name5= replace(name5,".tif","");
 			var name6= getTitle+"_Radius Histogram";
+				name6= replace(name6,".tif","");
 			var name8= getTitle+"_Histogram.csv";
-			var name9= replace(name0, ".tif", "-1.tif");
+				name8= replace(name8, ".tif","");
 			var name10= getTitle+"_Pore Outlines";
+				name10= replace(name10,".tif","");
 			var name11= getTitle+"_Pore Data";
+				name11= replace(name11,".tif","");
 			var name12= getTitle+"_Pore Summary";
+				name12= replace(name12,".tif","");
 			var name13= getTitle+"_Intersection Coordinates.txt";
+				name13= replace(name13,".tif","");
 			var name14= getTitle+"_Dilate";
+				name14= replace(name14,".tif","");
 			var name15= getTitle+"_Dilated Diam";
+				name15= replace(name15,".tif","");
 			var name17= getTitle+"_Orientation";
+				name17= replace(name17,".tif","");
 			
 // Creates custom file paths for use later
 			var path0 = myDir+name0;
