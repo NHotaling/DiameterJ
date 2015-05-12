@@ -20,7 +20,7 @@
 	if (endsWith(filename, "tif")) {
 		open(filename);
 
-// Save Statistical Region Merged Images into a Folder called SRM
+// Create an empty folder with nothing in it
 	myDir1 = dir1+"Best Segmentation"+File.separator;
 
 	File.makeDirectory(myDir1);
@@ -29,7 +29,7 @@
 
 			
 // Save SRM images that have been segmented into a folder called Segmented Images
-	myDir = dir1+"Segmented Images"+File.separator;
+	myDir = dir1+"Segmented Images_Mix"+File.separator;
 
 	File.makeDirectory(myDir);
 		if (!File.exists(myDir))
@@ -50,16 +50,25 @@
 // Creates custom file names for use later
 		var name0=getTitle;
 		var name1=getTitle+"_SRM";
-		var name2=getTitle+"_SRM+Huang";
-		var name3=getTitle+"_SRM+MinError";
-		var name4=getTitle+"_SRM+Percentile";
-		var name5=getTitle+"_SRM+Triangle";
-		var name6=getTitle+"_Huang";
-		var name7=getTitle+"_MinError";
-		var name8=getTitle+"_Percentile";
-		var name9=getTitle+"_Triangle";
-		var name10=getTitle+"_Montage";
-
+		var name2=getTitle+"_M1";
+			name2= replace(name2,".tif","");
+		var name3=getTitle+"_M2";
+			name3= replace(name3,".tif","");
+		var name4=getTitle+"_M3";
+			name4= replace(name4,".tif","");
+		var name5=getTitle+"_M4";
+			name5= replace(name5,".tif","");
+		var name6=getTitle+"_M5";
+			name6= replace(name6,".tif","");
+		var name7=getTitle+"_M6";
+			name7= replace(name7,".tif","");
+		var name8=getTitle+"_M7";
+			name8= replace(name8,".tif","");
+		var name9=getTitle+"_M8";
+			name9= replace(name9,".tif","");
+		var name10=getTitle+"_Mix Montage";
+			name10= replace(name10,".tif","");
+	
 // Creates custom file paths for use later
 		var path0 = myDir+name0;
 		var path1 = myDir+name2;

@@ -22,7 +22,7 @@
 
 			
 // Save SRM images that have been segmented into a folder called SRM Seg
-	myDir = dir1+"SRM_Seg"+File.separator;
+	myDir = dir1+"Segmented Images_SRM"+File.separator;
 
 	File.makeDirectory(myDir);
 		if (!File.exists(myDir))
@@ -30,11 +30,18 @@
 			print("");
 
 // Save SRM images that have been segmented into a folder called SRM Montage
-	myDir1 = dir1+"SRM_Montage"+File.separator;
+	myDir1 = dir1+"Montage Images"+File.separator;
 
 	File.makeDirectory(myDir1);
 		if (!File.exists(myDir1))
 			exit("Unable to create directory");
+
+// Create an empty folder with nothing in it
+	myDir2 = dir1+"Best Segmentation"+File.separator;
+
+	File.makeDirectory(myDir2);
+		if (!File.exists(myDir2))
+			exit("Unable to create directory");			
 
 			
 // Sets Scale of picture to pixels 
@@ -44,15 +51,25 @@
 		var name0=getTitle;
 		var name1=getTitle+"_SRM_100d2";
 		var name2=getTitle+"_SRM_50_10";
-		var name3=getTitle+"_SRM_100d2_H";
-		var name4=getTitle+"_SRM_100d2_M";
-		var name5=getTitle+"_SRM_100d2_P";
-		var name6=getTitle+"_SRM_100d2_T";
-		var name7=getTitle+"_SRM_SRM_50_10_H";
-		var name8=getTitle+"_SRM_50_10_M";
-		var name9=getTitle+"_SRM_50_10_P";
-		var name10=getTitle+"_SRM_50_10_T";
-		var name11=getTitle+"_Montage";
+			name2= replace(name2,".tif","");
+		var name3=getTitle+"_S1";
+			name3= replace(name3,".tif","");
+		var name4=getTitle+"_S2";
+			name4= replace(name4,".tif","");
+		var name5=getTitle+"_S3";
+			name5= replace(name5,".tif","");
+		var name6=getTitle+"_S4";
+			name6= replace(name6,".tif","");
+		var name7=getTitle+"_S5";
+			name7= replace(name7,".tif","");
+		var name8=getTitle+"_S6";
+			name8= replace(name8,".tif","");
+		var name9=getTitle+"_S7";
+			name9= replace(name9,".tif","");
+		var name10=getTitle+"_S8";
+			name10= replace(name10,".tif","");
+		var name11=getTitle+"_SRM Montage";
+			name11= replace(name11,".tif","");
 
 // Creates custom file paths for use later
 		var path0 = myDir+name0;
