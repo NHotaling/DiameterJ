@@ -49,6 +49,8 @@
 				name6= replace(name6,".tif","");
 			var name8= getTitle+"_Histogram.csv";
 				name8= replace(name8, ".tif","");
+			var name9= getTitle+"_Pores";
+				name9= replace(name9, ".tif","");
 			var name10= getTitle+"_Pore Outlines";
 				name10= replace(name10,".tif","");
 			var name11= getTitle+"_Pore Data";
@@ -73,6 +75,7 @@
 			var path5 = myDir1+name5;
 			var path6 = myDir2+name6;
 			var path8 = myDir2+name8;
+			var path9 = myDir+name9;
 			var path10 = myDir+name10;
 			var path11 = myDir2+name11;
 			var path12 = myDir1+name12;
@@ -269,11 +272,10 @@
 						
 	open(name0); 				
 // Analyzes dark areas from B&W picture to get pores
-		run("Set Measurements...", "area standard fit shape skewness kurtosis redirect=None decimal=6");
-		run("Analyze Particles...", "size=10-Infinity pixel circularity=0.00-1.00 show=Outlines display exclude clear include summarize");
-		
-
-		
+		run("Set Measurements...", "area perimeter fit shape area_fraction redirect=None decimal=4");
+		call("ij.plugin.filter.ParticleAnalyzer.setFontSize", 24); 
+			run("Analyze Particles...", "size=10-Infinity pixel circularity=0.00-1.00 show=Outlines display exclude clear include summarize");
+			saveAs("tiff",path9);
 		
 		selectWindow("Summary");
 			lines = split(getInfo(), "\n");
@@ -282,26 +284,28 @@
 					for (y=0; y<headings.length; y++){
 					Mean_Pore_Size= values[3];}
 						saveAs("Results", path12+".xls");		
-			selectWindow(name12+".xls");
+			selectWindow("Summary");
 			run("Close");
 
 			if (Mean_Pore_Size == "NaN"){
 				selectWindow(name0);
-				run("Analyze Particles...", "size=10-Infinity pixel circularity=0.00-1.00 show=Outlines display clear include summarize");
-						selectWindow("Summary");
-		
-			lines = split(getInfo(), "\n");
-				headings = split(lines[0], "\t");
-				values = split(lines[1], "\t");
-					for (y=0; y<headings.length; y++){
-					Mean_Pore_Size= values[3];}
-			saveAs("Results", name12+".xls");
-
-			selectWindow(path12+".xls");
+						call("ij.plugin.filter.ParticleAnalyzer.setFontSize", 24); 
+							run("Analyze Particles...", "size=10-Infinity pixel circularity=0.00-1.00 show=Outlines display exclude clear include summarize");
+							saveAs("tiff",path9);
+				
+				selectWindow("Summary");
+					lines = split(getInfo(), "\n");
+						headings = split(lines[0], "\t");
+						values = split(lines[1], "\t");
+							for (y=0; y<headings.length; y++){
+							Mean_Pore_Size= values[3];}
+					saveAs("Results", name12+".xls");
+			selectWindow("Summary");
 			run("Close");
 						};
 			
 			selectWindow("Results");
+				run("Summarize");
 				saveAs("Results", path11+".csv");					
 		run("Clear Results");
 			selectWindow("Results");
