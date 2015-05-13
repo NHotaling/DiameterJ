@@ -227,7 +227,7 @@
 							saveAs("Tiff", path6);
 						close();
 
-						run("Set Measurements...", "  mean standard modal integrated median skewness kurtosis redirect=None decimal=6");
+						run("Set Measurements...", "  mean standard modal integrated median redirect=None decimal=6");
 							run("Measure");
 								area_ave= 2*getResult("Mean",0);
 								area_stdev= 2*getResult("StdDev",0);
@@ -276,56 +276,50 @@
 		call("ij.plugin.filter.ParticleAnalyzer.setFontSize", 24); 
 			run("Analyze Particles...", "size=10-Infinity pixel circularity=0.00-1.00 show=Outlines display exclude clear include summarize");
 			saveAs("tiff",path9);
-		
+			
 		selectWindow("Summary");
 			lines = split(getInfo(), "\n");
 				headings = split(lines[0], "\t");
 				values = split(lines[1], "\t");
 					for (y=0; y<headings.length; y++){
 					Mean_Pore_Size= values[3];}
-						saveAs("Results", path12+".xls");		
 			selectWindow("Summary");
 			run("Close");
 
 			if (Mean_Pore_Size == "NaN"){
 				selectWindow(name0);
-						call("ij.plugin.filter.ParticleAnalyzer.setFontSize", 24); 
-							run("Analyze Particles...", "size=10-Infinity pixel circularity=0.00-1.00 show=Outlines display exclude clear include summarize");
-							saveAs("tiff",path9);
-				
-				selectWindow("Summary");
-					lines = split(getInfo(), "\n");
-						headings = split(lines[0], "\t");
-						values = split(lines[1], "\t");
-							for (y=0; y<headings.length; y++){
-							Mean_Pore_Size= values[3];}
-					saveAs("Results", name12+".xls");
-			selectWindow("Summary");
-			run("Close");
-						};
+				run("Analyze Particles...", "size=10-Infinity pixel circularity=0.00-1.00 show=Outlines display clear include summarize");
+					saveAs("tiff",path9);
+					selectWindow("Summary");
+					run("Close");
+				};
 			
+
 			selectWindow("Results");
 				run("Summarize");
+					Pore_Max = getResult("Area",nResults-1);
+					Pore_Min = getResult("Area",nResults-2);
+					Pore_SD = getResult("Area",nResults-3);
+					Mean_Pore_Size = getResult("Area",nResults-4);
 				saveAs("Results", path11+".csv");					
-		run("Clear Results");
-			selectWindow("Results");
-				run("Close");
-			
-			
+			run("Clear Results");
+				selectWindow("Results");
+					run("Close");
+					
 		run("Close");
 			close();
 		
 		
-				Int_Den= Ints*10000/(white_area+black_area);
-				Percent_Porosity= black_area/(white_area+black_area);
-				Ave_Len= ((vfiber_length+mfiber_length)/2);
-					Char_Len = Ave_Len/Ints;	
+		Int_Den= Ints*10000/(white_area+black_area);
+		Percent_Porosity= black_area/(white_area+black_area);
+		Ave_Len= ((vfiber_length+mfiber_length)/2);
+			Char_Len = Ave_Len/Ints;	
 		
 		
 // Prints for Final Variables
 			
-			Var = newArray("Super Pixel","Histogram_Mean","Histogram_SD","Histogram_Mode","Histogram Median","Mean Pore Size","Percent Porosity","Intersection Density (100x100px)","Characteristic Length");
-			Value_Pixels = newArray(V_M_Mean,area_ave,area_stdev,area_mode,area_median,Mean_Pore_Size,Percent_Porosity,Int_Den,Char_Len);
+			Var = newArray("Super Pixel","Histogram_Mean","Histogram_SD","Histogram_Mode","Histogram Median","Mean Pore Area", "Pore Area SD","Min. Pore Area","Max. Pore Area", "Percent Porosity","Intersection Density (100x100px)","Characteristic Length");
+			Value_Pixels = newArray(V_M_Mean,area_ave,area_stdev,area_mode,area_median,Mean_Pore_Size,Pore_SD,Pore_Min,Pore_Max,Percent_Porosity,Int_Den,Char_Len);
 	
 	Array.show("Total Summary",Var,Value_Pixels);
 		
@@ -334,9 +328,8 @@
 				run("Close");
 				run("Close All");
 
-		}if (endsWith(filename, "tif")) {
-		if (i == 1) {print(i+1," Images Analyzed Successfully");};
-			if (i > 1) {print(i+1," Images Analyzed Successfully");};}
+		}if (endsWith(filename, "tif" ) & i > 0) {
+			print(i+1," Images Analyzed Successfully");};
 	}
 T2 = getTime();
 TTime = (T2-T1)/1000;
