@@ -272,7 +272,7 @@
 						
 	open(name0); 				
 // Analyzes dark areas from B&W picture to get pores
-		run("Set Measurements...", "area perimeter fit shape area_fraction redirect=None decimal=4");
+		run("Set Measurements...", "area perimeter fit shape redirect=None decimal=4");
 		call("ij.plugin.filter.ParticleAnalyzer.setFontSize", 24); 
 			run("Analyze Particles...", "size=10-Infinity pixel circularity=0.00-1.00 show=Outlines display exclude clear include summarize");
 			saveAs("tiff",path9);
