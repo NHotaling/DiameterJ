@@ -327,6 +327,33 @@
 			saveAs("Results",path5);
 				run("Close");
 				run("Close All");
+				
+// Creates a montage of the areas measured
+	open(name0);
+	open(myDir+name1+".tif");
+	open(myDir+name14+".tif");
+	open(myDir+name9+".tif");	
+
+		run("Images to Stack", "method=[Scale (smallest)] name=Stack title=[] use");
+			selectWindow("Stack");
+
+					run("RGB Color");
+						setForegroundColor(175,0,0);
+				run("Make Montage...", "columns=2 rows=2 scale=1.0 first=1 last=4 increment=1 border=5 font=25 label use");
+
+// Saves montage image
+		saveAs("PNG", path18);
+		run("Close");
+		run("Close");
+			
+	setForegroundColor(0,0,0);	
+		File.delete(myDir+name1+".tif");
+		File.delete(myDir+name2+".tif");
+		File.delete(myDir+name9+".tif");
+		File.delete(myDir+name14+".tif");
+		print("\\Clear");
+			run("Close All");				
+			
 
 		}if (endsWith(filename, "tif" ) & i > 0) {
 			print(i+1," Images Analyzed Successfully");};
