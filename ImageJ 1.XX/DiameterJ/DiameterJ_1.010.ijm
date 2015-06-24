@@ -53,20 +53,21 @@
 				name9= replace(name9, ".tif","");
 			var name10= getTitle+"_Pore Outlines";
 				name10= replace(name10,".tif","");
-			var name11= getTitle+"_Pore Data";
+			var name11= getTitle+"_Pore Data.csv";
 				name11= replace(name11,".tif","");
 			var name12= getTitle+"_Pore Summary";
 				name12= replace(name12,".tif","");
 			var name13= getTitle+"_Intersection Coordinates.txt";
 				name13= replace(name13,".tif","");
-			var name14= getTitle+"_Dilate";
+			var name14= getTitle+"_Euclidean";
 				name14= replace(name14,".tif","");
 			var name15= getTitle+"_Dilated Diam";
 				name15= replace(name15,".tif","");
 			var name17= getTitle+"_Orientation";
 				name17= replace(name17,".tif","");
 			var name18= getTitle+"_Compare";
-				name18= replace(name18,".tif","");				
+				name18= replace(name18,".tif","");
+	
 			
 // Creates custom file paths for use later
 			var path0 = myDir+name0;
@@ -199,7 +200,7 @@
 							setBackgroundColor(255, 255, 255);
 						run("Clear Outside");
 						run("Save XY Coordinates...", "background=0 invert save=[path13]");				
-			
+							print("\\Clear");
 			open(name0);
 					run("Invert");
 					run("Skeletonize");
@@ -229,50 +230,45 @@
 						run("Histogram");
 							saveAs("Tiff", path6);
 						close();
+						print("\\Clear");
 
-						run("Set Measurements...", "  mean standard modal integrated median redirect=None decimal=6");
+						run("Set Measurements...", " modal median redirect=None decimal=6");
 							run("Measure");
-								area_ave= 2*getResult("Mean",0);
-								area_stdev= 2*getResult("StdDev",0);
 								area_mode= 2*getResult("Mode",0);
 								area_median= 2*getResult("Median",0);
-									setResult("Mean",0,area_ave);
-									setResult("StdDev",0,area_stdev);
-									setResult("Mode",0,area_mode);
-									setResult("Median",0,area_median);
-
-							n=0;
-							m=0;
-							getHistogram(values, counts, 256);
-								for (row=0; row<256; row++) {
+									run("Clear Results");
 									
-									setResult("Radius Value", row, row);
-									setResult("Radius Count", row, counts[row]);
-								
-								Calc_Fiber_Area= 2*values[row]*counts[row];	
-								Weigh_Fiber_Area= 4*values[row]*counts[row]*values[row];
-							
-									n=Calc_Fiber_Area+n;
-									m=Weigh_Fiber_Area+m;
-										}
+// Creates a matrix with all radius and count values in it
 
-									W_diameter = m/n;	
+						getHistogram(values, counts, 256);
+							Radius_Values = values;
+							Frequency = counts;
+								Array.show("Total Summary2",Radius_Values, Frequency);
+
+// Fits a Gaussian to the Radius data and gets center, SD, and 	height info.							
+							Fit.doFit("Gaussian",Radius_Values, Frequency);
+								area_ave = 2*Fit.p(2);
+								area_stdev = 2*Fit.p(3);
+								area_height = Fit.p(2)-Fit.p(1);
+			
+
+// Saves an overlay of the centerline on the EDT
 						run("Flatten");									
 							saveAs("tiff",path14);
 								close();
-						selectWindow("Results");
-							saveAs("Results",path8);
-								run("Clear Results");
-						selectWindow("Results");
+
+// Creates Variables with the values from the results table and saves the results table.							
+						selectWindow("Total Summary2");
+							saveAs("Results", path8);
 							run("Close");
 						roiManager("reset");
 						selectWindow("ROI Manager");
 							run("Close");
 						selectWindow("Log");
 							run("Close");
-						run("Close All");		
+						run("Close All");
 
-						
+					
 	open(name0); 				
 // Analyzes dark areas from B&W picture to get pores
 		run("Set Measurements...", "area perimeter fit shape redirect=None decimal=4");
@@ -304,7 +300,7 @@
 					Pore_Min = getResult("Area",nResults-2);
 					Pore_SD = getResult("Area",nResults-3);
 					Mean_Pore_Size = getResult("Area",nResults-4);
-				saveAs("Results", path11+".csv");					
+				saveAs("Results", path11);					
 			run("Clear Results");
 				selectWindow("Results");
 					run("Close");
