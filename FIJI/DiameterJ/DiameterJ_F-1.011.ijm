@@ -53,7 +53,7 @@
 				name9= replace(name9, ".tif","");
 			var name10= getTitle+"_Pore Outlines";
 				name10= replace(name10,".tif","");
-			var name11= getTitle+"_Pore Data.csv";
+			var name11= getTitle+"_Pore Data";
 				name11= replace(name11,".tif","");
 			var name12= getTitle+"_Pore Summary";
 				name12= replace(name12,".tif","");
@@ -66,8 +66,7 @@
 			var name17= getTitle+"_Orientation";
 				name17= replace(name17,".tif","");
 			var name18= getTitle+"_Compare";
-				name18= replace(name18,".tif","");
-	
+				name18= replace(name18,".tif","");				
 			
 // Creates custom file paths for use later
 			var path0 = myDir+name0;
@@ -200,7 +199,7 @@
 							setBackgroundColor(255, 255, 255);
 						run("Clear Outside");
 						run("Save XY Coordinates...", "background=0 invert save=[path13]");				
-							print("\\Clear");
+			
 			open(name0);
 					run("Invert");
 					run("Skeletonize");
@@ -232,10 +231,17 @@
 						close();
 						print("\\Clear");
 
-						run("Set Measurements...", " modal median redirect=None decimal=6");
+						run("Set Measurements...", "area modal min integrated median skewness kurtosis redirect=None decimal=6");
 							run("Measure");
 								area_mode= 2*getResult("Mode",0);
 								area_median= 2*getResult("Median",0);
+								area_min =  2*getResult("Min",0);
+								area_max = 2*getResult("Max",0);
+								area_intden = getResult("IntDen",0);
+								area_length = getResult("Area",0);
+								area_skew = getResult("Skew",0);
+								area_kurt = getResult("Kurt",0);
+								area_rawintden = getResult("RawIntDen",0);
 									run("Clear Results");
 									
 // Creates a matrix with all radius and count values in it
@@ -266,14 +272,15 @@
 							run("Close");
 						selectWindow("Log");
 							run("Close");
-						run("Close All");
+						run("Close All");	
 
-					
+						
 	open(name0); 				
 // Analyzes dark areas from B&W picture to get pores
 		run("Set Measurements...", "area perimeter fit shape redirect=None decimal=4");
 		call("ij.plugin.filter.ParticleAnalyzer.setFontSize", 24); 
 			run("Analyze Particles...", "size=10-Infinity pixel circularity=0.00-1.00 show=Outlines display exclude clear include summarize");
+			Pore_N = nResults;
 			saveAs("tiff",path9);
 			
 		selectWindow("Summary");
@@ -288,6 +295,7 @@
 			if (Mean_Pore_Size == "NaN"){
 				selectWindow(name0);
 				run("Analyze Particles...", "size=10-Infinity pixel circularity=0.00-1.00 show=Outlines display clear include summarize");
+				Pore_N = nResults;
 					saveAs("tiff",path9);
 					selectWindow("Summary");
 					run("Close");
@@ -300,7 +308,7 @@
 					Pore_Min = getResult("Area",nResults-2);
 					Pore_SD = getResult("Area",nResults-3);
 					Mean_Pore_Size = getResult("Area",nResults-4);
-				saveAs("Results", path11);					
+				saveAs("Results", path11+".csv");					
 			run("Clear Results");
 				selectWindow("Results");
 					run("Close");
@@ -317,19 +325,24 @@
 		
 // Prints for Final Variables
 			
-			Var = newArray("Super Pixel","Histogram_Mean","Histogram_SD","Histogram_Mode","Histogram Median","Mean Pore Area", "Pore Area SD","Min. Pore Area","Max. Pore Area", "Percent Porosity","Intersection Density (100x100px)","Characteristic Length");
-			Value_Pixels = newArray(V_M_Mean,area_ave,area_stdev,area_mode,area_median,Mean_Pore_Size,Pore_SD,Pore_Min,Pore_Max,Percent_Porosity,Int_Den,Char_Len);
+			Diameter_Metrics = newArray("Super Pixel","Histogram Mean","Histogram SD","Histogram Mode","Histogram Median", "Histogram Min Diam.", "Histogram Max Diam.", "Histogram Integrated Density", "Histogram Raw Integrated Density", "Diameter Skewness", "Diameter Kurtosis", "Fiber Length");
+			Other_Metrics = newArray("Mean Pore Area", "Pore Area SD","Min. Pore Area","Max. Pore Area", "Percent Porosity", "Number of Pores", "Intersection Density (100x100px)","Characteristic Length");
+			Diameter_Values = newArray(V_M_Mean,area_ave,area_stdev,area_mode,area_median,area_min,area_max,area_intden,area_rawintden,area_skew,area_kurt,area_length);
+			Values = newArray(Mean_Pore_Size,Pore_SD,Pore_Min,Pore_Max,Percent_Porosity,Pore_N,Int_Den,Char_Len);
+			_ = newArray(" ", " ", " ", " ", " ");
 	
-	Array.show("Total Summary",Var,Value_Pixels);
+	Array.show("Total Summary",Diameter_Metrics,Diameter_Values,_,Other_Metrics,Values);
 		
 		selectWindow("Total Summary");
 			saveAs("Results",path5);
 				run("Close");
 				run("Close All");
-
+				
 // Creates a montage of the areas measured
 	open(name0);
+		run("Invert");
 	open(myDir+name1+".tif");
+		run("Invert");
 	open(myDir+name14+".tif");
 	open(myDir+name9+".tif");	
 
@@ -352,7 +365,7 @@
 		File.delete(myDir+name14+".tif");
 		print("\\Clear");
 			run("Close All");				
-				
+			
 
 		}if (endsWith(filename, "tif" ) & i > 0) {
 			print(i+1," Images Analyzed Successfully");};
