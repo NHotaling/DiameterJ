@@ -17,7 +17,8 @@
 	File.makeDirectory(myDir);
 		if (!File.exists(myDir))
 			exit("Unable to create directory");
-			
+			print("");
+
 // Save Overall Summary of Diameters into a new folder called Summaries
 	myDir1 = dir1+"Summaries"+File.separator;
 
@@ -34,7 +35,7 @@
 				
 // Creates custom file names for use later
 			var name0= getTitle;
-			var name1= getTitle+"_Voronoi";	
+			var name1= getTitle+"_Intersections.csv";	
 				name1= replace(name1,".tif","");
 			var name2= getTitle+"_Axial Thinning.tif";
 				name2= replace(name2,".tif","");
@@ -52,7 +53,7 @@
 				name9= replace(name9, ".tif","");
 			var name10= getTitle+"_Pore Outlines";
 				name10= replace(name10,".tif","");
-			var name11= getTitle+"_Pore Data.csv";
+			var name11= getTitle+"_Pore Data";
 				name11= replace(name11,".tif","");
 			var name12= getTitle+"_Pore Summary";
 				name12= replace(name12,".tif","");
@@ -65,12 +66,11 @@
 			var name17= getTitle+"_Orientation";
 				name17= replace(name17,".tif","");
 			var name18= getTitle+"_Compare";
-				name18= replace(name18,".tif","");
-	
+				name18= replace(name18,".tif","");				
 			
 // Creates custom file paths for use later
 			var path0 = myDir+name0;
-			var path1 = myDir+name1;			
+			var path1 = myDir2+name1;			
 			var path2 = myDir+name2;
 			var path3 = myDir+name3;
 			var path4 = myDir+name4;
@@ -97,26 +97,22 @@
 					if (fiber_area == 0){
 						print("Error there are no fibers in ",name0," to analyze");
 							exit();};
-
+					
 // Sets the Voronoi Analysis to monochrome 8bit image iterate and count correctly.
 	run("Options...", "iterations=1 count=1 pad edm=8-bit do=Nothing");
 	run("Voronoi");
 	run("Brightness/Contrast...");
 		setMinAndMax(0, 0);
 			run("Apply LUT");
-//			run("Close");
 		selectWindow("B&C");
 			run("Close");
 		run("Make Binary");
-
+			
 //Gets number of black pixels from Voronoi Analysis	for fiber length		
 				getHistogram(values, counts, 256);
-					vfiber_length = counts[255];
-					
-// Saves B&W Voronoi Skeleton Image for analysis
-		saveAs("Tiff", path1);	
-			run("Close All");					
-							
+					vfiber_length = counts[255];		
+			run("Close All");
+		
 	open(name0); 
 // Runs the Medial Axis Tranformation for an alternative skeleton structure			
 	open(name0);
@@ -129,13 +125,27 @@
 					mfiber_length = counts[255];
 					Medial_Fiber_Diameter= fiber_area/mfiber_length;	
 
-//Gets number of Medial Analysis intersections					
-			run("Analyze Skeleton (2D/3D)", "prune=[shortest branch]");
+//Gets number of Medial Analysis intersections and lengths between intersections					
+			run("Analyze Skeleton (2D/3D)", "prune=[shortest branch] show");
+				selectWindow("Tagged skeleton");
+				close();
+				
+				selectWindow("Results");
 					mthree_point= getResult("# Junctions",0);
 					mfour_point= getResult("# Quadruple points",0);
 					mthree_point= mthree_point - mfour_point;
-			selectWindow("Results");		
-				close();
+				run("Close");
+				
+			selectWindow("Branch information");
+				saveAs("Results",path1);
+				run("Close");
+			
+			open(myDir2+name1);
+				run("Summarize");
+					Char_Length_Mean = getResult("Branch length",nResults-4);
+					Char_Length_SD = getResult("Branch length",nResults-3);
+					Char_Length_Max = getResult("Branch length",nResults-1);
+				saveAs("Results",path1);
 				run("Close");
 				
 // Saves B&W picture for analysis
@@ -155,7 +165,7 @@
 			CVfiber_Length = vfiber_length- mthree_point*0.5*c - mfour_point*c;
 			CVfiber_Diam = fiber_area/CVfiber_Length;
 				V_M_Mean = (CVfiber_Diam+CMFiber_Diam)/2;
-				
+
 	open(name0);
 		run("OrientationJ Distribution", "log=0.0 tensor=7.0 gradient=0 min-coherency=0.0 min-energy=0.0 harris-index=on s-distribution=on hue=Gradient-X sat=Gradient-X bri=Gradient-X ");
 			saveAs("Tiff", path17);
@@ -179,7 +189,7 @@
 							setBackgroundColor(255, 255, 255);
 						run("Clear Outside");
 						run("Save XY Coordinates...", "background=0 invert save=[path13]");				
-							print("\\Clear");
+			
 			open(name0);
 					run("Invert");
 					run("Skeletonize");
@@ -252,9 +262,9 @@
 							run("Close");
 						selectWindow("Log");
 							run("Close");
-						run("Close All");
+						run("Close All");	
 
-					
+						
 	open(name0); 				
 // Analyzes dark areas from B&W picture to get pores
 		run("Set Measurements...", "area perimeter fit shape redirect=None decimal=4");
@@ -288,7 +298,7 @@
 					Pore_Min = getResult("Area",nResults-2);
 					Pore_SD = getResult("Area",nResults-3);
 					Mean_Pore_Size = getResult("Area",nResults-4);
-				saveAs("Results", path11);					
+				saveAs("Results", path11+".csv");					
 			run("Clear Results");
 				selectWindow("Results");
 					run("Close");
@@ -300,14 +310,15 @@
 		Int_Den= Ints*10000/(white_area+black_area);
 		Percent_Porosity= black_area/(white_area+black_area);
 		Ave_Len= (CVfiber_Length+CMedial_Len)/2;
-			Char_Len = Ave_Len/Ints;	
+			Char_Len = Ave_Len/Ints;		
+		
 		
 // Prints for Final Variables
 			
 			Diameter_Metrics = newArray("Super Pixel","Histogram Mean","Histogram SD","Histogram Mode","Histogram Median", "Histogram Min Diam.", "Histogram Max Diam.", "Histogram Integrated Density", "Histogram Raw Integrated Density", "Diameter Skewness", "Diameter Kurtosis", "Fiber Length");
-			Other_Metrics = newArray("Mean Pore Area", "Pore Area SD","Min. Pore Area","Max. Pore Area", "Percent Porosity", "Number of Pores", "# of Intersections", "Intersection Density (100x100px)","Characteristic Length");
+			Other_Metrics = newArray("Mean Pore Area", "Pore Area SD","Min. Pore Area","Max. Pore Area", "Percent Porosity", "Number of Pores", "# of Intersections", "Intersection Density (100x100px)","Char. Length", "SD Char. Length", "Max Span Length", "Old Char. Length (Tot. Fiber Len./# intersections)");
 			Diameter_Values = newArray(V_M_Mean,area_ave,area_stdev,area_mode,area_median,area_min,area_max,area_intden,area_rawintden,area_skew,area_kurt,area_length);
-			Values = newArray(Mean_Pore_Size,Pore_SD,Pore_Min,Pore_Max,Percent_Porosity,Pore_N,Ints,Int_Den,Char_Len);
+			Values = newArray(Mean_Pore_Size,Pore_SD,Pore_Min,Pore_Max,Percent_Porosity,Pore_N,Ints,Int_Den,Char_Length_Mean,Char_Length_SD,Char_Length_Max,Char_Len);
 			_ = newArray(" ", " ", " ", " ", " ");
 	
 	Array.show("Total Summary",Diameter_Metrics,Diameter_Values,_,Other_Metrics,Values);
@@ -316,10 +327,11 @@
 			saveAs("Results",path5);
 				run("Close");
 				run("Close All");
-
+				
 // Creates a montage of the areas measured
 	open(name0);
-	open(myDir+name1+".tif");
+		run("Invert");
+	open(myDir+name2+".tif");
 	open(myDir+name14+".tif");
 	open(myDir+name9+".tif");	
 
@@ -336,13 +348,13 @@
 		run("Close");
 			
 	setForegroundColor(0,0,0);	
-		File.delete(myDir+name1+".tif");
+		File.delete(myDir2+name13);
 		File.delete(myDir+name2+".tif");
 		File.delete(myDir+name9+".tif");
 		File.delete(myDir+name14+".tif");
 		print("\\Clear");
-
-				
+			run("Close All");				
+			
 
 		}if (endsWith(filename, "tif")) {
 		if (i == 1) {print(i," Image Analyzed Successfully");};
