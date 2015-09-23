@@ -8,8 +8,8 @@
 //Define Crop size of all images to be analyzed
 	Crop_bin= getNumber("Do you want to crop the image? (1 = Yes    2 = No)",1);
 	if (Crop_bin==1){
-		cropw= getNumber("Croped image width (pixels)",1280);
-		croph= getNumber("Croped image height (pixels)",880);};
+		cropw= getNumber("Cropped image width (pixels)",1280);
+		croph= getNumber("Cropped image height (pixels)",880);};
 		
 
 	T1 = getTime();	
