@@ -1,0 +1,24 @@
+Starting out:
+Download and install ImageJ 1.48 or newer or Fiji (latest version).  If you installed imageJ before the end of 2013 you should uninstall your current version of ImageJ (DO NOT UPDATE) and reinstall ImageJ 1.48 or newer. Before uninstall be sure to copy all of your old plugins into a separate folder as these will be removed when you uninstall your old version of ImageJ.  
+ 
+Old ImageJ
+http://imagej.nih.gov/ij/download.html
+
+FIJI
+http://imagej.net/Downloads
+
+
+Download and unzip the files and move or copy the three folders into the plugins folder of ImageJ/FIJI.  
+
+For windows that should be in directory:
+ 
+"C:\Program Files\ImageJ\plugins"
+ 
+Or 
+ 
+"C:\Program Files (x86)\ImageJ\plugins"
+ 
+Restart ImageJ/FIJI after that.  
+ 
+For more detailed installation and user instructions please go to:
+https://docs.google.com/document/d/1lODEj02e2eFtQ-v0B3TJd53Q2XFZZW2i0szrfyX0kRY/edit?usp=sharing
