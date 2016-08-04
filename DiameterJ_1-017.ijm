@@ -109,16 +109,16 @@ if(Batch_analysis == "Yes") {
 
 if(R_Loc == "Yes"){
 // Save Analyzed B&W image into a new folder called Diameter Location
-	myDir3 = dir1+"Diameter Location"+File.separator;
+	myDir4 = dir1+"Diameter Location"+File.separator;
 
-	File.makeDirectory(myDir3);
-		if (!File.exists(myDir3))
+	File.makeDirectory(myDir4);
+		if (!File.exists(myDir4))
 			exit("Unable to create directory");
 	};			
 				
 // Creates custom file names for use later
 	name0= getTitle;	
-	name =  newArray(name0, name0+"_Intersections.csv", name0+"_Axial_Thinning.tif",
+	name =  newArray(name0, name0+"_Char Lengths.csv", name0+"_Axial_Thinning.tif",
 					   name0+"_Diameter", name0+"_log", name0+"_Total Summary.csv", name0+"_Radius Plot", 
 					   name0+"_Pore Data2.csv", name0+"_Radius Histo.csv", name0+"_pores", name0+"_Pore Outlines", name0+"_Pore Data",
 					   name0+"_Pore Summary", name0+"_Intersection Coordinates.txt", name0+"_Euclidean", 
@@ -175,8 +175,8 @@ if(R_Loc == "Yes"){
 			var path18 = myDir+name[18];
 			
 		if(R_Loc == "Yes"){			
-			var path19 = myDir3+name[19];
-			var path20 = myDir3+name[20];	
+			var path19 = myDir4+name[19];
+			var path20 = myDir4+name[20];	
 		};			
 			var path21 = myDir2+name[21];
 
@@ -261,8 +261,6 @@ if(R_Loc == "Yes"){
 
 //Gets number of Medial Analysis intersections and lengths between intersections					
 			run("Analyze Skeleton (2D/3D)", "prune=[shortest branch]");
-				selectWindow("Tagged skeleton");
-				close();
 				
 				selectWindow("Results");
 					mthree_point= getResult("# Junctions",0);
@@ -304,8 +302,7 @@ open(path2+".tif");
 			run("Analyze Skeleton (2D/3D)", "prune=[shortest branch] show");
 			selectWindow("Results");
 				run("Close");
-			selectWindow("Tagged skeleton");
-				close();
+
 				
 	selectWindow("Branch information");
 				saveAs("Results",path1);
@@ -775,16 +772,94 @@ if(unit_conv == "Yes"){
 						c = getResult(radrows[i],j);
 						c = d + c;
 					} 
-					setResult("Sum of Frequencies", j, c);
+					setResult("Sum_of_Frequencies", j, c);
 					}
-				saveAs("Results", myDir3+"All_Radius_Values.csv");
+			saveAs("Results", myDir2+"All_Radius_Values.csv");
+	
+			Freq_n = 0;
+			Freq_temp = 0;
+				for(ia = 0; ia<n; ia++){
+						Freq_temp  = getResult("Sum_of_Frequencies",ia);
+						Freq_n = Freq_n+Freq_temp;
+					}
+					
+			for (ib = 0; ib<n; ib++){
+				fm = (getResult("Sum_of_Frequencies",ib))*(getResult("Radius",ib));
+				setResult("For Mean", ib, fm );
+			}
+			
+			Mean_radn = 0;
+			Mean_rad_temp = 0;
+				for(ic = 0; ic<n; ic++){
+						Mean_rad_temp  = getResult("For Mean",ic);
+						Mean_radn = Mean_radn + Mean_rad_temp;
+					}
+			Mean_Rad = Mean_radn/Freq_n;
+
+			for (ie = 0; ie<n; ie++){
+				fsd = (getResult("Sum_of_Frequencies",ie))*((getResult("Radius",ie))-Mean_Rad)*((getResult("Radius",ie))-Mean_Rad);
+				setResult("For SD", ie, fsd );
+			}
+			
+			rad_sdn = 0;
+			rad_sdn_temp = 0;
+				for(ih = 0; ih<n; ih++){
+						rad_sdn_temp  = getResult("For SD",ih);
+						rad_sdn = rad_sdn + rad_sdn_temp;
+					}
+			Rad_SD = sqrt(rad_sdn/(Freq_n-1));
+				
+			
+			for (ig = 0; ig<n; ig++){
+				fsk = (getResult("Sum_of_Frequencies",ig))*(((getResult("Radius",ig))-(Mean_Rad))/(Rad_SD))*(((getResult("Radius",ig))-(Mean_Rad))/(Rad_SD))*(((getResult("Radius",ig))-(Mean_Rad))/(Rad_SD));
+					setResult("For Skewness", ig, fsk );
+				fku = getResult("Sum_of_Frequencies",ig)*((getResult("Radius",ig)-(Mean_Rad))/(Rad_SD))*((getResult("Radius",ig)-(Mean_Rad))/(Rad_SD))*((getResult("Radius",ig)-(Mean_Rad))/(Rad_SD))*((getResult("Radius",ig)-(Mean_Rad))/(Rad_SD));
+					setResult("For Kurtosis", ig, fku );
+			}
+				
+			Skewness_n = 0;
+			Skew_temp = 0;
+			Kurtosis_n = 0;
+			Kurt_temp = 0;
+				for(ih = 0; ih<n; ih++){
+					Skew_temp  = getResult("For Skewness",ih);
+					Skewness_n = Skewness_n+Skew_temp;
+					Kurt_temp  = getResult("For Kurtosis",ih);
+					Kurtosis_n = Kurtosis_n+Kurt_temp;
+				}
+				
+			
+			
+// Calculates Skewness and Kurtosis for the radius values				
+			Skewness = Skewness_n*(Freq_n/((Freq_n-1)*(Freq_n-2)));
+			Kurtosis = Kurtosis_n*(Freq_n*(Freq_n+1)/((Freq_n-1)*(Freq_n-2)*(Freq_n-3)))-3*((Freq_n-1)*(Freq_n-1))/((Freq_n-2)*(Freq_n-3));
+				
+				Radius_Vals = newArray(nResults);
+				Cum_Freq_Vals = newArray(nResults);
+			for(io=0; io<n; io++){
+				Radius_Vals[io] = getResult("Radius",io);
+				Cum_Freq_Vals[io] = getResult("Sum_of_Frequencies",io);
+			}
+// Fits a Gaussian to the Radius data and gets center, SD, and 	height info.
+						
+			Fit.doFit("Gaussian", Radius_Vals, Cum_Freq_Vals);
+				Mean_Diameter = 2*Fit.p(2);
+				Diameter_SD = 2*Fit.p(3);
+				
+			run("Clear Results");
+			open(myDir2 + "All_Radius_Values.csv");
+					setResult("Average Cumulative Diameter",0,Mean_Diameter);
+					setResult("Cumulative Diameter SD",0,Diameter_SD);
+					setResult("Cumulative Diameter Skewness",0,Skewness);
+					setResult("Cumulative Diameter Kurtosis",0,Kurtosis);
+					
+			saveAs("Results", myDir3+"All_Radius_Values.csv");
+
 				File.delete(myDir2+"All_Radius_Values.csv");
-				run("Close");
+				run("Close All");
+				run("Clear Results");
 				print("\\Clear");
 		}
-
-		
-		
 		
 //Analysis for Combining Intersections		
 	if(batch_combo == "Yes") {
